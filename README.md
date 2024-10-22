@@ -1,7 +1,7 @@
 # shp23dtile
 背景：
-cesiums开发者遇到大量点云数据时，shp转3dtile时较为复杂。
-shp转3dtile格式有多个方法，cesiumlab是官方方法，耗时较长，且长期使用需要认证和付费。
+Cesium开发者遇到大量点云数据时，shp转3dtile时较为复杂。
+shp转3dtile格式有多个方法，Cesiumlab是官方方法，耗时较长，且长期使用需要认证和付费。
 基于GIS出身，我编写了一个小工具，喜欢请点个收藏。
 
 English:
