@@ -1,0 +1,51 @@
+# pip install pyshp laspy numpy
+import shapefile  # 需要安装pyshp库，即shapefile模块
+import laspy
+import numpy as np
+from pyproj import Proj, Transformer
+import os
+
+input_folder = 'C:\\Users\\xxq\\Desktop\\JS'
+output_folder = 'C:\\Users\\xxq\\Desktop\\JS\\LAS_Outputs'
+
+sf = shapefile.Reader(os.path.join(input_folder, shp_file))
+
+fields = [field[0] for field in sf.fields[1:]]
+records = sf.records()
+
+# xpos,ypos,zpos对应shp文件属性表中的lon，lat和height
+# 若没有这三个属性，可在计算几何中生成。
+x_field = 'xpos'
+y_field = 'ypos'
+z_field = 'zpos'
+
+x_vals = np.array([record[fields.index(x_field)] for record in records], dtype=float)
+y_vals = np.array([record[fields.index(y_field)] for record in records], dtype=float)
+z_vals = np.array([record[fields.index(z_field)] for record in records], dtype=float)
+
+# # 进行坐标转换，cesium默认加载ecef坐标
+# shp为投影坐标，需要先转为地理坐标
+proj_utm = 'EPSG:32650'    # WGS84 UTM Zone 50N
+proj_wgs84 = 'EPSG:4326'    # WGS84 经纬度
+
+transformer_to_wgs84 = Transformer.from_crs(proj_utm, proj_wgs84)
+
+lon_vals, lat_vals = transformer_to_wgs84.transform(x_vals, y_vals)
+
+# 地理坐标转为ecef坐标
+transformer_to_ecef = Transformer.from_proj(proj_wgs84, Proj(proj='geocent', ellps='WGS84', datum='WGS84'))
+
+x_ecef, y_ecef, z_ecef = transformer_to_ecef.transform(lon_vals, lat_vals, z_vals)
+
+header = laspy.LasHeader(point_format=3, version="1.2")
+las = laspy.LasData(header)
+
+las.x = x_ecef
+las.y = y_ecef
+las.z = z_ecef
+
+output_las_path = os.path.join(output_folder, shp_file.replace('.shp', '_ecef.las'))
+
+las.write(output_las_path)
+
+print(f"LAS 文件已成功生成: {output_las_path}")
