@@ -10,4 +10,4 @@ Based on the GIS origin, I wrote a small tool, like please click a Star.
 步骤：
 shp转3dtile格式有多个方法，cesiumlab是官方方法，耗时较长，且长期使用需要认证和付费。
 
-此处方法路线是将shp转为las，然后利用las转为3dtile.
+此处方法路线是将shp转为las，然后利用las转为3dtile.（有待完善）
